@@ -1,4 +1,4 @@
-import { PlusCircle, QrCode, BarChart3 } from 'lucide-react';
+import { PlusCircle, QrCode, BarChart3, CreditCard } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar,
@@ -16,6 +16,7 @@ const items = [
   { title: 'Create QR Code', url: '/', icon: PlusCircle },
   { title: 'Analytics', url: '/analytics', icon: BarChart3 },
   { title: 'My QR Codes', url: '/my-qr-codes', icon: QrCode },
+  { title: 'Billing', url: '/billing', icon: CreditCard },
 ];
 
 export function AppSidebar() {

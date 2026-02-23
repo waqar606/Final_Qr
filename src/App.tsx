@@ -8,7 +8,9 @@ import MyQRCodes from "./pages/MyQRCodes";
 import ViewQR from "./pages/ViewQR";
 import Analytics from "./pages/Analytics";
 import EditQRCode from "./pages/EditQRCode";
+import Billing from "./pages/Billing";
 import NotFound from "./pages/NotFound";
+import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
 import AppLayout from "@/components/AppLayout";
@@ -40,6 +42,8 @@ const App = () => (
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/my-qr-codes" element={<MyQRCodes />} />
               <Route path="/edit/:id" element={<EditQRCode />} />
+              <Route path="/billing" element={<Billing />} />
+              <Route path="/checkout" element={<Checkout />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
