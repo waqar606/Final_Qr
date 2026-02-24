@@ -137,6 +137,7 @@ const Index = () => {
         </div>
 
         <div className="hidden lg:block w-[360px] border-l bg-muted/30 p-6">
+        <div className="mt-16">
           <PhoneMockup>
             {step >= 2 && qrData ? (
               <QRPreview data={qrData} style={style} size={200} />
@@ -153,6 +154,7 @@ const Index = () => {
               </div>
             )}
           </PhoneMockup>
+          </div>
         </div>
       </div>
     </div>

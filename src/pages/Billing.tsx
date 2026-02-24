@@ -60,11 +60,11 @@ export default function Billing() {
           Select the most convenient plan for you.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`relative bg-card border rounded-2xl p-6 flex flex-col ${
+            className={`relative bg-card border rounded-2xl p-8 flex flex-col min-h-[600px] ${
               plan.popular ? "border-primary shadow-lg" : ""
             }`}
           >
@@ -80,10 +80,10 @@ export default function Billing() {
                 )}
               </>
             )}
-            <h2 className="text-xl font-bold text-primary text-center mt-2">
+            <h2 className="text-xl font-bold text-primary text-center mt-4">
               {plan.name}
             </h2>
-            <div className="text-center mt-4">
+            <div className="text-center mt-6">
               <span className="text-2xl font-bold">{plan.price}</span>{" "}
               <span className="text-sm text-muted-foreground">
                 {plan.priceDetail}
@@ -93,7 +93,7 @@ export default function Billing() {
               {plan.interval}
             </p>
             <Button
-              className="w-full mt-6"
+              className="w-full mt-8"
               onClick={() => handleBuy(plan)}
               disabled={loadingPlan === plan.name}
             >
@@ -103,7 +103,7 @@ export default function Billing() {
                 "Buy Now"
               )}
             </Button>
-            <ul className="mt-6 space-y-3">
+            <ul className="mt-8 space-y-4 flex-1">
               {features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
