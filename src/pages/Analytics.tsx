@@ -2,7 +2,9 @@ import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { QrCode, ScanLine, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { QrCode, ScanLine, Users, Download } from 'lucide-react';
 import {
   ChartContainer,
   ChartTooltip,
@@ -21,6 +23,8 @@ import {
   Legend,
 } from 'recharts';
 import { format, subDays, startOfDay, isAfter } from 'date-fns';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 interface Scan {
   id: string;
@@ -51,6 +55,7 @@ export default function Analytics() {
   const [period, setPeriod] = useState('7');
   const [selectedQR, setSelectedQR] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -114,6 +119,49 @@ export default function Analytics() {
     unique: { label: 'Unique Scans', color: 'hsl(210, 70%, 50%)' },
   };
 
+  // Prepare export data
+  const prepareExportData = () => {
+    return filteredScans.map(scan => {
+      const qrCode = qrCodes.find(qr => qr.id === scan.qr_code_id);
+      return {
+        'Date/time': format(new Date(scan.scanned_at), 'yyyy-MM-dd HH:mm:ss'),
+        'QR Name': qrCode?.name || 'Unknown',
+        'Country Name': scan.country || 'Unknown',
+        'Country ISO': scan.country || 'Unknown',
+        'City': scan.city || 'Unknown',
+        'Operating System': scan.operating_system || 'Unknown',
+        'Unique Visitor': `${scan.operating_system}-${scan.country}-${scan.city}`
+      };
+    });
+  };
+
+  // Export to CSV
+  const exportToCSV = () => {
+    const data = prepareExportData();
+    const headers = Object.keys(data[0] || {});
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => `"${row[header as keyof typeof row]}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const fileName = `Analytics_${format(new Date(), 'MMM_dd_yyyy')}.csv`;
+    saveAs(blob, fileName);
+    setIsExportModalOpen(false);
+  };
+
+  // Export to XLSX
+  const exportToXLSX = () => {
+    const data = prepareExportData();
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Analytics');
+    
+    const fileName = `Analytics_${format(new Date(), 'MMM_dd_yyyy')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    setIsExportModalOpen(false);
+  };
+
   const renderDonut = (data: { name: string; value: number }[], title: string) => (
     <Card>
       <CardHeader className="pb-2">
@@ -157,7 +205,44 @@ export default function Analytics() {
 
   return (
     <div className="flex-1 p-6 space-y-6 overflow-auto">
-      <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+        
+        <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-green-600 hover:bg-green-700">
+              <Download className="w-4 h-4 mr-2" />
+              Export info
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Export info</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
+              <p className="text-sm text-muted-foreground">
+                Choose the format to export your analytics data
+              </p>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={exportToCSV}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  CSV
+                </Button>
+                <Button 
+                  onClick={exportToXLSX}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  XLSX
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
